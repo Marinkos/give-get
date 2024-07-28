@@ -1,13 +1,13 @@
 //Generate modal table and Show total amount
 document.addEventListener("DOMContentLoaded", function () {
     const donationTotalElement = document.getElementById("donationTotal");
-    fetchDataAndUpdateTotal(donationTotalElement); // Fetch data and update #donationTotal on load
+    fetchDataAndUpdateTotal(donationTotalElement);
   
     const donationTableButton = document.getElementById("donationTable");
     const donationTotal2Element = document.getElementById("donationTotal2");
   
     donationTableButton.addEventListener("click", function () {
-      fetchDataAndUpdateTotal(donationTotal2Element); // Fetch data and update #donationTotal2 on button click
+      fetchDataAndUpdateTotal(donationTotal2Element);
     });
   
     function fetchDataAndUpdateTotal(totalElement, retries = 5, interval = 1000) {
@@ -63,7 +63,7 @@ document.addEventListener("DOMContentLoaded", function () {
   
     function updateUI(charityMap) {
       const donationInfo = document.querySelector(".donation_info");
-      donationInfo.innerHTML = ""; // Clear existing content
+      donationInfo.innerHTML = "";
   
       Object.entries(charityMap).forEach(([charName, charity]) => {
         const donationRow = document.createElement("div");
@@ -84,5 +84,39 @@ document.addEventListener("DOMContentLoaded", function () {
         donationInfo.appendChild(donationRow);
       });
     }
+  });
+  
+  //Stripe chechout
+  document.addEventListener('DOMContentLoaded', function() {
+    const donateButton = document.querySelector('#donateButton');
+  
+    donateButton.addEventListener('click', function() {
+      const donationTotalElement = document.querySelector('#donationTotal2');
+      let amount = donationTotalElement.innerText.replace('A$', '').trim();
+      amount = parseFloat(amount) * 100; 
+  
+      const data = {
+        amount: amount
+      };
+  
+      fetch('https://xqsu-ttbr-nccs.n7c.xano.io/api:UQuTJ3vx/sessions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.sessionURL) {
+          window.location.href = data.sessionURL;
+        } else {
+          console.error('Failed to create Stripe session:', data);
+        }
+      })
+      .catch(error => {
+        console.error('Error creating Stripe session:', error);
+      });
+    });
   });
   
