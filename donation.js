@@ -91,14 +91,19 @@ document.addEventListener("DOMContentLoaded", function () {
     const donateButton = document.querySelector('#donateButton');
   
     donateButton.addEventListener('click', function() {
+      // Extract amount from the #donationTotal2 element and remove the currency symbol and formatting
       const donationTotalElement = document.querySelector('#donationTotal2');
       let amount = donationTotalElement.innerText.replace('A$', '').trim();
-      amount = parseFloat(amount) * 100; 
+      amount = parseFloat(amount) * 100; // Convert to cents for Stripe
   
+      // Prepare data to be sent to the Xano API
       const data = {
-        amount: amount
+        amount: amount,
+        success_url: 'https://haveyoursay.givenget.org/success', // URL to redirect to on successful payment
+        cancel_url: 'https://haveyoursay.givenget.org/fail' // URL to redirect to if payment is cancelled
       };
   
+      // Call the Xano API endpoint to create a Stripe session
       fetch('https://xqsu-ttbr-nccs.n7c.xano.io/api:UQuTJ3vx/sessions', {
         method: 'POST',
         headers: {
@@ -109,6 +114,7 @@ document.addEventListener("DOMContentLoaded", function () {
       .then(response => response.json())
       .then(data => {
         if (data.sessionURL) {
+          // Redirect to Stripe Checkout page
           window.location.href = data.sessionURL;
         } else {
           console.error('Failed to create Stripe session:', data);
